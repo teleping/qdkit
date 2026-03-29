@@ -1,0 +1,9 @@
+app:
+  name: app
+  version: 0.1
+
+logging:
+  level: info
+
+database:
+  quantdb: 'mysql+pymysql://quant:quant@localhost:3306/quant'
