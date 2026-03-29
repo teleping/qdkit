@@ -5,10 +5,10 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="qdkit",
-    version="0.1.0",
+    version="0.1.2",
     author="teleping",
     author_email="teleping@gmail.com",
-    description="financial data toolkit",
+    description="quant data toolkits",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://pypi.org/project/qdkit/",
