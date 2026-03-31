@@ -5,14 +5,14 @@ import datetime as dt, pandas as pd
 from insight_python.com.insight import common
 from insight_python.com.insight import query
 from insight_python.com.insight.market_service import market_service
-
+from .commons import config
 
 class HT_Insight():
 
-    def __init__(self, user='******', password='******', login_log=False, open_trace=False,
+    def __init__(self, user=None, password=None, login_log=False, open_trace=False,
                  open_file_log=False, open_console_log=False):
-        self.user = user
-        self.password = password
+        self.user = user if user else config['htzq']['user']
+        self.password = password if password else config['htzq']['password']
         self.login_log = login_log
         self.open_trace = open_trace
         self.open_file_log = open_file_log

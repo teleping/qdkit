@@ -7,3 +7,11 @@ logging:
 
 database:
   quantdb: 'mysql+pymysql://quant:quant@localhost:3306/quant'
+
+gtja:
+  access_key_id: '********************************'
+  access_key_secret: '********************************'
+
+htzq:
+  user: '********'
+  password: '********'

@@ -1,3 +1,3 @@
 # qdkit
 
-Quant Data Toolkit sdk for python.
+Quant Data Toolkits for python.
