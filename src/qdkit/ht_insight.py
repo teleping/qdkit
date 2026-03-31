@@ -5,7 +5,8 @@ import datetime as dt, pandas as pd
 from insight_python.com.insight import common
 from insight_python.com.insight import query
 from insight_python.com.insight.market_service import market_service
-from .commons import config
+from .commons import config, logger
+
 
 class HT_Insight():
 
@@ -51,6 +52,11 @@ class HT_Insight():
         end_date = dt.datetime.now() if end_date is None else end_date
         return query.get_kline(htsc_code=codes, time=[start_date, end_date], frequency=frequency, fq=fq)
 
+    def get_daily_basic(self, code, start_date: dt.datetime = None, end_date: dt.datetime = None):
+        start_date = dt.datetime(2015, 1, 1) if start_date is None else start_date
+        end_date = dt.datetime.now() if end_date is None else end_date
+        return query.get_daily_basic(htsc_code=code, trading_day=[start_date, end_date])
+
     def get_fin_indicator(self, code, start_date: dt.datetime = None, end_date: dt.datetime = None, period='Q4'):
         start_date = dt.datetime(2015, 1, 1) if start_date is None else start_date
         end_date = dt.datetime.now() if end_date is None else end_date
@@ -88,6 +94,9 @@ class HT_Insight():
     def get_industries(self, name='sw_l1'):
         return query.get_industries(classified=name)
 
+    def get_industry(self, code, classified='sw'):
+        return query.get_industry(htsc_code=code, classified=classified)
+
     def get_index_component(self, code, date):
         return query.get_index_component(code, None, None, date)
 
@@ -95,4 +104,4 @@ class HT_Insight():
 class InsightMarketService(market_service):
     def on_query_response(self, result):
         for response in iter(result):
-            print(response)
+            logger.info(response)
