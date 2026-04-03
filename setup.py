@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="qdkit",
-    version="0.1.4",
+    version="0.1.7",
     author="teleping",
     author_email="teleping@gmail.com",
     description="quant data toolkits",
@@ -31,6 +31,7 @@ setuptools.setup(
         "logbook",
         "pyyaml",
         "requests",
+        "insight-py-win"
     ],
     extras_require={
         "bloomberg": ["xbbg"],

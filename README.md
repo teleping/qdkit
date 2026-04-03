@@ -6,13 +6,14 @@ Quant Data Toolkits for python.
 
 ## 目录
 
-- [安装](#安装)
-- [华泰证券数据API (HT_Insight)](#华泰证券数据api-ht_insight)
-- [国泰君安期货数据API (GTJA)](#国泰君安期货数据api-gtja)
-- [配置说明](#配置说明)
+- [安装](#install)
+- [国泰君安期货数据API (GTJA)](#gtja)
+- [华泰证券数据API (HT_Insight)](#ht-insight)
+- [配置说明](#config)
 
 ---
 
+<a id="install"></a>
 ## 安装
 
 ```bash
@@ -21,6 +22,145 @@ pip install qdkit
 
 ---
 
+
+<a id="gtja"></a>
+## 国泰君安期货数据API (GTJA)
+
+国泰君安期货数据接口封装，提供期货合约、价格、基差、库存、加工利润等数据。
+
+### 初始化
+
+无需初始化，直接调用模块级函数。
+
+首次使用前需要配置 API 访问密钥（`access_key_id` / `access_key_secret`）。
+
+- 默认从项目根目录 `config.yaml` 的 `gtja` 节读取；
+- 也可在运行时临时覆盖（适合测试或多账号切换）。
+
+```python
+from qdkit import gtja_api
+
+# 方式：使用 config.yaml 中的 gtja 密钥（默认）
+# gtja:
+#   access_key_id: 'your_access_key_id'
+#   access_key_secret: 'your_access_key_secret'
+```
+
+### 主要方法
+
+#### 1. 查询期货合约参数
+
+```python
+# 查询指定日期所有交易所的期货合约参数
+df = gtja_api.get_futures_contracts()
+
+# 指定日期
+df = gtja_api.get_futures_contracts(date='2026-03-31')
+
+# 支持多种日期格式
+df = gtja_api.get_futures_contracts(date=20260331)  # 整数
+df = gtja_api.get_futures_contracts(date='2026/03/31')  # 斜杠分隔
+df = gtja_api.get_futures_contracts(date=dt.datetime(2026, 3, 31))  # datetime 对象
+```
+
+#### 2. 查询期货合约价格
+
+```python
+# 查询指定日期期货合约价格
+df = gtja_api.get_futures_prices()
+
+# 指定日期
+df = gtja_api.get_futures_prices(date='2026-03-31')
+```
+
+#### 3. 查询期货基差数据
+
+```python
+# 查询所有合约的基差数据
+df = gtja_api.get_futures_basis()
+
+# 查询指定合约的基差数据
+df = gtja_api.get_futures_basis(
+    'cu',         # code
+    '2025-01-01', # start_date
+    '2026-03-31'  # end_date
+)
+```
+
+#### 4. 查询期货库存数据
+
+```python
+# 查询指定品种的库存数据
+df = gtja_api.get_futures_inventory(
+    'cu',         # code
+    '2025-01-01', # start_date
+    '2026-03-31'  # end_date
+)
+```
+
+#### 5. 查询期货加工利润数据
+
+```python
+# 查询指定品种的加工利润数据
+df = gtja_api.get_futures_profit(
+    'cu',         # code
+    '2025-01-01', # start_date
+    '2026-03-31'  # end_date
+)
+```
+
+### 交易所编码映射
+
+国泰君安 API 支持以下交易所：
+
+
+| 国泰君安编码 | 万得编码 | 说明         |
+| ------ | ---- | ---------- |
+| CFFEX  | CFE  | 中国金融期货交易所  |
+| CZCE   | CZC  | 郑州商品交易所    |
+| DCE    | DCE  | 大连商品交易所    |
+| INE    | INE  | 上海国际能源交易中心 |
+| SHFE   | SHF  | 上海期货交易所    |
+| GFEX   | GFE  | 广州期货交易所    |
+
+
+### 日期格式支持
+
+所有日期参数支持以下格式：
+
+```python
+# 字符串格式
+'2026-03-31'  # ISO 格式
+'2026/03/31'  # 斜杠分隔
+'20260331'    # 紧凑格式
+
+# 整数格式
+20260331
+
+# datetime 对象
+dt.datetime(2026, 3, 31)
+dt.date(2026, 3, 31)
+
+# None 表示当天
+None  # 默认为当前日期
+```
+
+### 返回值
+
+所有查询函数返回 `pandas.DataFrame`，查询失败返回 `None`。
+
+```python
+df = gtja_api.get_futures_contracts()
+if df is not None:
+    print(df.head())
+    print(df.columns)
+else:
+    print("查询失败")
+```
+
+---
+
+<a id="ht-insight"></a>
 ## 华泰证券数据API (HT_Insight)
 
 华泰证券 Insight 数据接口封装，提供股票行情、财务数据、交易日历等功能。
@@ -204,146 +344,17 @@ ht.close()
 | `open_file_log`    | bool | 是否写入文件日志，默认 False   |
 | `open_console_log` | bool | 是否打印控制台日志，默认 False  |
 
-
 ---
 
-## 国泰君安期货数据API (GTJA)
-
-国泰君安期货数据接口封装，提供期货合约、价格、基差、库存、加工利润等数据。
-
-### 初始化
-
-无需初始化，直接调用模块级函数。
-
-首次使用前需要配置 API 访问密钥（`access_key_id` / `access_key_secret`）。
-
-- 默认从项目根目录 `config.yaml` 的 `gtja` 节读取；
-- 也可在运行时临时覆盖（适合测试或多账号切换）。
-
-```python
-from qdkit import gtja_api
-
-# 方式：使用 config.yaml 中的 gtja 密钥（默认）
-# gtja:
-#   access_key_id: 'your_access_key_id'
-#   access_key_secret: 'your_access_key_secret'
-```
-
-### 主要方法
-
-#### 1. 查询期货合约参数
-
-```python
-# 查询指定日期所有交易所的期货合约参数
-df = gtja_api.get_futures_contracts()
-
-# 指定日期
-df = gtja_api.get_futures_contracts(date='2026-03-31')
-
-# 支持多种日期格式
-df = gtja_api.get_futures_contracts(date=20260331)  # 整数
-df = gtja_api.get_futures_contracts(date='2026/03/31')  # 斜杠分隔
-df = gtja_api.get_futures_contracts(date=dt.datetime(2026, 3, 31))  # datetime 对象
-```
-
-#### 2. 查询期货合约价格
-
-```python
-# 查询指定日期期货合约价格
-df = gtja_api.get_futures_prices()
-
-# 指定日期
-df = gtja_api.get_futures_prices(date='2026-03-31')
-```
-
-#### 3. 查询期货基差数据
-
-```python
-# 查询所有合约的基差数据
-df = gtja_api.get_futures_basis()
-
-# 查询指定合约的基差数据
-df = gtja_api.get_futures_basis(
-    'cu',         # code
-    '2025-01-01', # start_date
-    '2026-03-31'  # end_date
-)
-```
-
-#### 4. 查询期货库存数据
-
-```python
-# 查询指定品种的库存数据
-df = gtja_api.get_futures_inventory(
-    'cu',         # code
-    '2025-01-01', # start_date
-    '2026-03-31'  # end_date
-)
-```
-
-#### 5. 查询期货加工利润数据
-
-```python
-# 查询指定品种的加工利润数据
-df = gtja_api.get_futures_profit(
-    'cu',         # code
-    '2025-01-01', # start_date
-    '2026-03-31'  # end_date
-)
-```
-
-### 交易所编码映射
-
-国泰君安 API 支持以下交易所：
-
-
-| 国泰君安编码 | 万得编码 | 说明         |
-| ------ | ---- | ---------- |
-| CFFEX  | CFE  | 中国金融期货交易所  |
-| CZCE   | CZC  | 郑州商品交易所    |
-| DCE    | DCE  | 大连商品交易所    |
-| INE    | INE  | 上海国际能源交易中心 |
-| SHFE   | SHF  | 上海期货交易所    |
-| GFEX   | GFE  | 广州期货交易所    |
-
-
-### 日期格式支持
-
-所有日期参数支持以下格式：
-
-```python
-# 字符串格式
-'2026-03-31'  # ISO 格式
-'2026/03/31'  # 斜杠分隔
-'20260331'    # 紧凑格式
-
-# 整数格式
-20260331
-
-# datetime 对象
-dt.datetime(2026, 3, 31)
-dt.date(2026, 3, 31)
-
-# None 表示当天
-None  # 默认为当前日期
-```
-
-### 返回值
-
-所有查询函数返回 `pandas.DataFrame`，查询失败返回 `None`。
-
-```python
-df = gtja_api.get_futures_contracts()
-if df is not None:
-    print(df.head())
-    print(df.columns)
-else:
-    print("查询失败")
-```
-
----
-
+<a id="config"></a>
 ## 配置说明
+
+### 确保在项目中存在 `config.yaml` 和 `logs` 目录：
+
+1. `config.yaml` 文件存在项目根目录下且配置完整；
+2. `logs` 目录存在项目根目录下
+
+---
 
 ### 配置文件位置
 
@@ -437,12 +448,3 @@ with HT_Insight() as ht:
 ```
 
 ---
-
-## 常见问题
-
-### Q: 本地导入时出现配置文件或日志目录相关错误（例如 `IndexError`）？
-
-A: 当前实现会优先在项目根目录查找 `config.yaml` 和 `logs` 目录。运行前请确保：
-
-1. 项目根目录下的 `config.yaml` 存在且配置完整；
-2. `logs` 目录存在项目根目录下
