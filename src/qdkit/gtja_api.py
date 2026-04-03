@@ -86,7 +86,7 @@ def get_futures_basis(code=None, start_date=None, end_date=None):
     })
 
 
-def get_futures_inventory(code, report_date=None, start_date=None, end_date=None):
+def get_futures_inventory(code, start_date=None, end_date=None, report_date=None):
     """查询期货库存数据，code 为品种代码"""
     return _api_query(_api_futures_inventory, {
         'code': code,
@@ -96,7 +96,7 @@ def get_futures_inventory(code, report_date=None, start_date=None, end_date=None
     })
 
 
-def get_futures_profit(code, report_date=None, start_date=None, end_date=None):
+def get_futures_profit(code, start_date=None, end_date=None, report_date=None):
     """查询期货加工利润数据，code 为品种代码"""
     return _api_query(_api_futures_profit, {
         'code': code,
