@@ -7,11 +7,14 @@ Quant Data Toolkits for python.
 ## 目录
 
 - [安装](#install)
+- [配置说明](#config)
 - [国泰君安期货数据API (GTJA)](#gtja)
 - [华泰证券数据API (HT_Insight)](#ht-insight)
-- [配置说明](#config)
+- [东证期货 Finoview 数据API (DZQH)](#dzqh)
 
 ---
+
+
 
 <a id="install"></a>
 ## 安装
@@ -21,6 +24,57 @@ pip install qdkit
 ```
 
 ---
+
+<a id="config"></a>
+## 配置说明
+
+### 确保在项目中存在 `config.yaml` 和 `logs` 目录：
+
+1. `config.yaml` 文件存在项目根目录下且配置完整；
+2. `logs` 目录存在项目根目录下
+
+---
+
+### 配置文件位置
+
+配置文件建议放在项目根目录 `config.yaml`，需要包含以下内容：
+
+```yaml
+app:
+  name: myapp
+  version: 0.1
+
+logging:
+  level: info
+
+htzq:
+  user: 'your_htzq_user'
+  password: 'your_htzq_password'
+
+gtja:
+  access_key_id: 'your_access_key_id'
+  access_key_secret: 'your_access_key_secret'
+
+dzqh:
+  app_key: 'your_app_key'
+  app_secret: 'your_app_secret'
+```
+
+### 配置项说明
+
+
+| 配置项                      | 说明                       |
+| ------------------------ | ------------------------ |
+| `htzq.user`              | 华泰证券用户名                  |
+| `htzq.password`          | 华泰证券密码                   |
+| `gtja.access_key_id`     | 国泰君安 API 访问密钥 ID         |
+| `gtja.access_key_secret` | 国泰君安 API 访问密钥密码          |
+| `dzqh.app_key`           | 东证期货 Finoview APP Key    |
+| `dzqh.app_secret`        | 东证期货 Finoview APP Secret |
+
+
+---
+
 
 
 <a id="gtja"></a>
@@ -159,6 +213,8 @@ else:
 ```
 
 ---
+
+
 
 <a id="ht-insight"></a>
 ## 华泰证券数据API (HT_Insight)
@@ -344,49 +400,87 @@ ht.close()
 | `open_file_log`    | bool | 是否写入文件日志，默认 False   |
 | `open_console_log` | bool | 是否打印控制台日志，默认 False  |
 
----
-
-<a id="config"></a>
-## 配置说明
-
-### 确保在项目中存在 `config.yaml` 和 `logs` 目录：
-
-1. `config.yaml` 文件存在项目根目录下且配置完整；
-2. `logs` 目录存在项目根目录下
 
 ---
 
-### 配置文件位置
 
-配置文件建议放在项目根目录 `config.yaml`，需要包含以下内容：
 
-```yaml
-app:
-  name: myapp
-  version: 0.1
+## 东证期货 Finoview 数据API (DZQH)
 
-logging:
-  level: info
+东证期货 Finoview 数据接口封装，提供繁微指标目录、指标时序数据、期货市场价差目录和价差时序数据查询功能。
 
-htzq:
-  user: 'your_htzq_user'
-  password: 'your_htzq_password'
+### 初始化
 
-gtja:
-  access_key_id: 'your_access_key_id'
-  access_key_secret: 'your_access_key_secret'
+无需实例化，直接调用模块级函数。
+
+```python
+from qdkit import dzqh_api
+import datetime as dt
 ```
 
-### 配置项说明
+首次使用前需要在 `config.yaml` 中配置接口密钥：
 
+```yaml
+dzqh:
+  app_key: 'your_app_key'
+  app_secret: 'your_app_secret'
+```
 
-| 配置项                      | 说明               |
-| ------------------------ | ---------------- |
-| `htzq.user`              | 华泰证券用户名          |
-| `htzq.password`          | 华泰证券密码           |
-| `gtja.access_key_id`     | 国泰君安 API 访问密钥 ID |
-| `gtja.access_key_secret` | 国泰君安 API 访问密钥密码  |
+### 主要方法
 
+#### 1. 获取繁微指标目录
+
+```python
+# 获取指标目录
+df = dzqh_api.get_index_list()
+
+# 只抓取前 10 页，适合测试
+df = dzqh_api.get_index_list(pages=10)
+```
+
+#### 2. 获取繁微指标数据
+
+```python
+# 查询单个指标在指定时间区间内的数据
+df = dzqh_api.get_index_data(
+    id='DZ00012732',
+    start_date='2019-04-01',
+    end_date='2019-04-19'
+)
+
+# 支持 datetime / date / int / str
+df = dzqh_api.get_index_data(
+    id='DZ00012732',
+    start_date=dt.datetime(2026, 1, 1),
+    end_date=dt.date(2026, 3, 31)
+)
+```
+
+#### 3. 获取期货价差目录
+
+```python
+# 当前默认查询“基差”目录
+df = dzqh_api.get_spread_list()
+
+# 显式指定价差类型
+df = dzqh_api.get_spread_list(type='基差')
+```
+
+#### 4. 获取期货价差时序数据
+
+```python
+# 查询单个价差 ID 的时序数据
+df = dzqh_api.get_spread_data(
+    ids='BASIS_001',
+    start_date='2025-01-01'
+)
+
+# 一次查询多个价差 ID
+df = dzqh_api.get_spread_data(
+    ids=['BASIS_001', 'BASIS_002'],
+    start_date=dt.datetime(2025, 1, 1)
+)
+```
 
 ---
 
@@ -447,4 +541,22 @@ with HT_Insight() as ht:
         print(f"{code}: {len(df)} 条财务数据")
 ```
 
+### 示例4：先查价差目录，再取价差时序
+
+```python
+from qdkit import dzqh_api
+
+# 1. 获取“基差”目录
+catalog = dzqh_api.get_spread_list(type='基差')
+
+# 2. 取前两个目录 ID
+ids = catalog['id'].head(2).tolist()
+
+# 3. 获取价差时序数据
+df = dzqh_api.get_spread_data(ids=ids, start_date='2025-01-01')
+
+print(df.head())
+```
+
 ---
+
