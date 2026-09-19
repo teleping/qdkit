@@ -4,9 +4,9 @@
 @Auth ： zhangping
 @Desc ：东证期货 Finoview API封装
 """
-import time, pandas as pd, datetime as dt, requests, json, re
+import time, pandas as pd, datetime as dt, requests, json
 
-from commons import config, logger
+from .commons import config, logger
 
 requests.packages.urllib3.disable_warnings()
 
@@ -61,7 +61,10 @@ def get_index_list(pages=300):
     for i in range(0, pages):
         dfs.append(_api_query(_api_index_catalogue, {'numpage': i}))
         time.sleep(1)
-    return pd.concat(dfs, axis=0).reset_index(drop=True)
+
+    return pd.concat(dfs, axis=0).reset_index(drop=True).rename(
+        columns={'指标编码': 'code', '指标名称': 'name', '单位': 'unit', '频度': 'frequency', '数据来源': 'source',
+                 '备注': 'remark', 'R': 'r'})
 
 
 def get_index_data(id, start_date, end_date):
@@ -70,7 +73,9 @@ def get_index_data(id, start_date, end_date):
         'superIndexLabel': id,
         'StartDate': _get_date_str(start_date),
         'EndDate': _get_date_str(end_date)
-    })
+    }).rename(columns={'F_ID': 'code', 'F_DATE': 'date', 'F_VALUE': 'value', 'F_NAME': 'name', 'F_UNIT': 'unit',
+                       'F_FREQUENCY': 'frequency', 'F_RESOURCE': 'resource', 'F_COMMENT': 'comment',
+                       'F_DESC': 'description', 'F_RECORD_TIME': 'record_time'})
 
 
 def get_spread_list(type='基差'):
