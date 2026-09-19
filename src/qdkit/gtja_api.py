@@ -19,6 +19,7 @@ _api_futures_prices = _api_url + 'unicorn.cloudApi.futuresContractPrice.queryByC
 _api_futures_basis = _api_url + 'unicorn.cloudApi.basisData.query.do'  # 基差数据查询
 _api_futures_inventory = _api_url + 'unicorn.cloudApi.inventoryData.queryByCode.do'  # 库存数据查询
 _api_futures_profit = _api_url + 'unicorn.cloudApi.processProfitData.queryByCode.do'  # 加工利润数据查询
+_api_futures_prices_min = _api_url + 'unicorn.cloudApi.futuresContractPrice.queryByMinute.do'  # 期货合约分钟价格
 
 # ==================== 请求头 ====================
 request_header = {
@@ -103,4 +104,14 @@ def get_futures_profit(code, start_date=None, end_date=None, report_date=None):
         # 'reportDate': _get_date_str(report_date, '%Y-%m-%d'),
         'startDataDate': _get_date_str(start_date, '%Y-%m-%d'),
         'endDataDate': _get_date_str(end_date, '%Y-%m-%d')
+    })
+
+
+def get_futures_min_prices(code, start_time, end_time, period='1min'):
+    """查询指定日期期货合约价格"""
+    return _api_query(_api_futures_prices_min, {
+        'contractCode': code,
+        'startTime': _get_date_str(start_time, format='%Y-%m-%d %H:%M:%S'),
+        'endTime': _get_date_str(end_time, format='%Y-%m-%d %H:%M:%S'),
+        'period': period
     })
